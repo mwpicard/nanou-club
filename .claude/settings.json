@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status*)", "Bash(git diff*)", "Bash(git log*)", "Bash(git add*)", "Bash(git commit*)",
+      "Bash(python3 -m http.server*)",
+      "Bash(curl -s http://127.0.0.1:*)",
+      "Bash(supabase *)",
+      "Bash(/opt/homebrew/bin/supabase *)",
+      "Bash(./database/regenerate-schema-snapshot.sh)",
+      "Bash(node --check *)"
+    ]
+  }
+}

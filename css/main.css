@@ -1,0 +1,4 @@
+:root { --ink: #1d2420; --ground: #f7f8f6; --accent: #2c7a58; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; color: var(--ink); background: var(--ground); }
+main { max-width: 46rem; margin: 0 auto; padding: 2rem 1rem; }

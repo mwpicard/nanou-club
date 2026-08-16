@@ -1,0 +1,19 @@
+name: Smoke Test
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+env:
+  BASE_URL: https://EXAMPLE.org   # FILL IN
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Wait for GitHub Pages deploy
+        run: sleep 60
+      - name: Homepage responds
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/")
+          echo "GET / -> $code"
+          test "$code" = "200"
