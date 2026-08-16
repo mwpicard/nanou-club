@@ -4,7 +4,7 @@ on:
     branches: [main]
   workflow_dispatch:
 env:
-  BASE_URL: https://EXAMPLE.org   # FILL IN
+  BASE_URL: https://mwpicard.github.io/nanou-club
 jobs:
   smoke:
     runs-on: ubuntu-latest

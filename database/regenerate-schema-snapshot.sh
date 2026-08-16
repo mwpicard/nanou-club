@@ -12,7 +12,7 @@
 #
 #     ./database/regenerate-schema-snapshot.sh
 #
-# Needs SUPABASE_DB_PASSWORD_FILL_ME in the environment (it is in ~/.zshrc).
+# Needs SUPABASE_DB_PASSWORD_NANOU in the environment (it is in ~/.zshrc).
 #
 # Structure only — no rows are read, so the output never contains customer data.
 # It does contain function bodies; those are reviewed for secrets by the check at
@@ -21,11 +21,11 @@
 set -euo pipefail
 
 PGDUMP=/opt/homebrew/opt/libpq/bin/pg_dump
-PROJECT_REF=FILL_ME
+PROJECT_REF=qrwkqnhdcoftikeancxr
 OUT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/CURRENT-SCHEMA.sql"
 
-if [[ -z "${SUPABASE_DB_PASSWORD_FILL_ME:-}" ]]; then
-    echo "SUPABASE_DB_PASSWORD_FILL_ME is not set. Run:  source ~/.zshrc" >&2
+if [[ -z "${SUPABASE_DB_PASSWORD_NANOU:-}" ]]; then
+    echo "SUPABASE_DB_PASSWORD_NANOU is not set. Run:  source ~/.zshrc" >&2
     exit 1
 fi
 if [[ ! -x "$PGDUMP" ]]; then
@@ -33,7 +33,7 @@ if [[ ! -x "$PGDUMP" ]]; then
     exit 1
 fi
 
-CONN="postgresql://postgres.${PROJECT_REF}:${SUPABASE_DB_PASSWORD_FILL_ME}@aws-1-eu-west-3.pooler.supabase.com:5432/postgres"
+CONN="postgresql://postgres.${PROJECT_REF}:${SUPABASE_DB_PASSWORD_NANOU}@aws-1-eu-west-3.pooler.supabase.com:5432/postgres"
 
 TMP="$(mktemp)"
 trap 'rm -f "$TMP"' EXIT

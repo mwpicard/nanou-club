@@ -1,28 +1,23 @@
-# webapp-template
+# Nanou Club
 
-Martin's standard starting point for a dynamic web app built with Claude Code.
+NANOU is a 35-ton steel Bruce Roberts cutter, built 1986 in Durban. Two world
+circumnavigations under Bernard — who escaped communist Poland in a ship he
+built inside a mine — then twenty years in harbour. She now lies in Port de
+Masnou, near Barcelona, waiting.
 
-**Stack:** static HTML/CSS/JS frontend on GitHub Pages (custom domain via CNAME)
-+ Supabase (Postgres with RLS, Auth, Edge Functions) as the dynamic layer.
-Maps use Leaflet.js + OpenStreetMap.
+This is the club that gets her sailing again: members fund the boat, paid crew
+maintain her, and members join voyages — a sailing leg, or a live-aboard
+harbour stay — by clicking the route line on a chart. The 2003 nanou.org
+itinerary already said *"click anywhere on the blue route line"*; we kept the
+interaction and pointed it at the future.
 
-## Using this template
+- **The adventures so far:** https://nanou.org (legacy archive, 20 years of
+  stories and photos — kept intact in `mwpicard/nanou`)
+- **Requirements & schema:** [docs/PRD.md](docs/PRD.md) — agreed before code
+- **Stack:** GitHub Pages + Supabase (Postgres/RLS, Auth, Edge Functions),
+  Leaflet + OpenStreetMap + OpenSeaMap. Scaffolded from
+  [`mwpicard/webapp-template`](https://github.com/mwpicard/webapp-template).
 
-```bash
-gh repo create <org>/<name> --template mwpicard/webapp-template --public --clone
-```
-
-Then:
-1. Fill in the placeholders in `CLAUDE.md` (domain, Supabase project ref, what the app is).
-2. Write the PRD in `docs/PRD.md` and agree the schema **before** writing app code.
-3. Create the Supabase project, `supabase link`, write migrations in `supabase/migrations/`.
-4. Set `PROJECT_REF` in `database/regenerate-schema-snapshot.sh` and run it after every schema change.
-5. Build one feature at a time; keep `features.md` current; verify in a real browser before committing.
-6. Enable GitHub Pages, add `CNAME`, confirm the smoke workflow goes green.
-
-## Rules that travel with every project
-
-- Never push without asking — pushes to `main` go live.
-- Verify DB schema (`database/CURRENT-SCHEMA.sql`) before writing queries.
-- RLS on every table from the first migration. Anon key in the browser is fine; service-role keys never are.
-- AI/API keys live only in Edge Functions.
+This repo doubles as a teaching example of building a dynamic web app with
+Claude Code — the PRD, schema-first workflow, and build log are part of the
+point.

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join the club — Nanou Club</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⛵</text></svg>">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <header class="site">
+    <a class="brand" href="index.html">NANOU CLUB</a>
+    <nav>
+      <a href="index.html">The story</a>
+      <a href="boat.html">The boat</a>
+      <a href="costs.html">Costs &amp; fees</a>
+      <a href="join.html" aria-current="page">Join the club</a>
+      <a href="https://nanou.org">Adventures so far ↗</a>
+    </nav>
+  </header>
+  <main>
+    <p class="eyebrow">Membership</p>
+    <h1>Join the club</h1>
+    <p class="lede">Tell us who you are and why Nanou. Two existing members
+    approve each application (the skipper approves directly while the club is
+    young). Once approved, you can book voyage legs and harbour stays.</p>
+
+    <!-- Step 1: sign in -->
+    <section id="signin" hidden>
+      <div class="card">
+        <h2>1 · Sign in with your email</h2>
+        <p>We'll send a magic link — no password to remember.</p>
+        <form id="signin-form">
+          <label for="email">Email</label>
+          <input id="email" type="email" required autocomplete="email" placeholder="you@example.com">
+          <p><button class="btn" type="submit">Send magic link</button></p>
+        </form>
+        <p id="signin-msg" role="status"></p>
+      </div>
+    </section>
+
+    <!-- Step 2: apply -->
+    <section id="apply" hidden>
+      <div class="card">
+        <h2>2 · Your application</h2>
+        <form id="apply-form">
+          <label for="full_name">Name</label>
+          <input id="full_name" required autocomplete="name">
+          <label for="experience">Sailing experience (none is fine — living aboard needs none)</label>
+          <input id="experience" placeholder="e.g. coastal crewing, RYA Day Skipper, none yet">
+          <label for="statement">Why Nanou?</label>
+          <textarea id="statement" required placeholder="A few sentences for the members who'll approve you."></textarea>
+          <p><button class="btn" type="submit">Submit application</button></p>
+        </form>
+        <p id="apply-msg" role="status"></p>
+      </div>
+      <p><button id="signout" type="button" class="btn" style="background:var(--ink-soft)">Sign out</button></p>
+    </section>
+
+    <!-- Step 3: status -->
+    <section id="status" hidden>
+      <div class="card">
+        <h2>Your application</h2>
+        <p id="status-line"></p>
+      </div>
+      <p><button id="signout2" type="button" class="btn" style="background:var(--ink-soft)">Sign out</button></p>
+    </section>
+  </main>
+  <footer class="site">NANOU · Port de Masnou · <a href="https://nanou.org">the adventures so far</a></footer>
+
+  <script type="module">
+    import { supabase } from './js/supabase-client.js';
+    const $ = id => document.getElementById(id);
+    const show = id => ['signin','apply','status'].forEach(s => $(s).hidden = s !== id);
+
+    async function render() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { show('signin'); return; }
+
+      const uid = session.user.id;
+      const { data: membership } = await supabase.from('memberships')
+        .select('status, joined_on').eq('profile_id', uid).maybeSingle();
+      if (membership?.status === 'active') {
+        $('status-line').innerHTML =
+          `<span class="chip ok">Active member</span> since ${membership.joined_on}. Welcome aboard.`;
+        show('status'); return;
+      }
+
+      const { data: app } = await supabase.from('membership_applications')
+        .select('status, created_at').eq('profile_id', uid)
+        .order('created_at', { ascending: false }).limit(1).maybeSingle();
+      if (app?.status === 'pending') {
+        $('status-line').innerHTML =
+          `<span class="chip">Pending</span> Submitted ${new Date(app.created_at).toLocaleDateString('en-GB')} — waiting for member approvals.`;
+        show('status'); return;
+      }
+      if (app?.status === 'rejected') {
+        $('status-line').innerHTML = `Your previous application wasn't approved. You may apply again below.`;
+      }
+      const { data: profile } = await supabase.from('profiles')
+        .select('full_name, sailing_experience').eq('id', uid).maybeSingle();
+      if (profile?.full_name) $('full_name').value = profile.full_name;
+      if (profile?.sailing_experience) $('experience').value = profile.sailing_experience;
+      show('apply');
+    }
+
+    $('signin-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const { error } = await supabase.auth.signInWithOtp({
+        email: $('email').value,
+        options: { emailRedirectTo: window.location.href }
+      });
+      $('signin-msg').textContent = error
+        ? `Could not send the link: ${error.message}`
+        : 'Link sent — check your email, then return here.';
+    });
+
+    $('apply-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const { data: { session } } = await supabase.auth.getSession();
+      const uid = session.user.id;
+      const p = await supabase.from('profiles').update({
+        full_name: $('full_name').value,
+        sailing_experience: $('experience').value
+      }).eq('id', uid);
+      const a = p.error ? p : await supabase.from('membership_applications')
+        .insert({ profile_id: uid, statement: $('statement').value });
+      if (p.error || a.error) {
+        $('apply-msg').innerHTML = `<span class="error">Could not submit: ${(p.error || a.error).message}</span>`;
+      } else {
+        await render();
+      }
+    });
+
+    const signout = async () => { await supabase.auth.signOut(); await render(); };
+    $('signout').addEventListener('click', signout);
+    $('signout2').addEventListener('click', signout);
+    supabase.auth.onAuthStateChange((_e, s) => { if (s) render(); });
+    await render();
+  </script>
+</body>
+</html>

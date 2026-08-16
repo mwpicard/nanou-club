@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Costs &amp; fees — Nanou Club</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⛵</text></svg>">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <header class="site">
+    <a class="brand" href="index.html">NANOU CLUB</a>
+    <nav>
+      <a href="index.html">The story</a>
+      <a href="boat.html">The boat</a>
+      <a href="costs.html" aria-current="page">Costs &amp; fees</a>
+      <a href="join.html">Join the club</a>
+      <a href="https://nanou.org">Adventures so far ↗</a>
+    </nav>
+  </header>
+  <main>
+    <p class="eyebrow">Transparency first</p>
+    <h1>What the boat costs, what members pay</h1>
+    <p class="lede">The club doesn't invent prices. Running costs are published
+    here as they are known, and every fee is <strong>decided by club vote</strong>.
+    Until the club votes an amount, a fee shows as "to be voted".</p>
+
+    <h2>Running costs</h2>
+    <div class="tablewrap"><table id="costs">
+      <thead><tr><th>Item</th><th>Category</th><th>Period</th><th>Amount</th></tr></thead>
+      <tbody><tr><td colspan="4">Loading…</td></tr></tbody>
+    </table></div>
+
+    <h2>Membership fees</h2>
+    <div class="tablewrap"><table id="fees">
+      <thead><tr><th>Fee</th><th>Period</th><th>Amount</th><th>Voted on</th></tr></thead>
+      <tbody><tr><td colspan="4">Loading…</td></tr></tbody>
+    </table></div>
+
+    <p class="notice">Payments are recorded manually for now (bank transfer /
+    Bizum); online payment arrives in a later phase. Members see their own
+    payment history on their dashboard.</p>
+  </main>
+  <footer class="site">NANOU · Port de Masnou · <a href="https://nanou.org">the adventures so far</a></footer>
+  <script type="module">
+    import { supabase } from './js/supabase-client.js';
+    const eur = c => c == null ? '<span class="chip">to be voted</span>'
+                               : (c / 100).toLocaleString('en-GB', { style: 'currency', currency: 'EUR' });
+    const period = p => ({ monthly:'per month', annual:'per year', one_off:'one-off',
+                           per_night:'per night', per_leg:'per leg' }[p] ?? p);
+
+    const costs = await supabase.from('cost_items')
+      .select('name, category, period, amount_cents').eq('active', true).order('category');
+    document.querySelector('#costs tbody').innerHTML = costs.error
+      ? `<tr><td colspan="4" class="error">Could not load costs (${costs.error.message}).</td></tr>`
+      : costs.data.map(c => `<tr><td>${c.name}</td><td>${c.category}</td>
+          <td>${period(c.period)}</td><td class="num">${eur(c.amount_cents)}</td></tr>`).join('');
+
+    const fees = await supabase.from('fee_schedule')
+      .select('name, period, amount_cents, decided_by_vote_on').eq('active', true).order('name');
+    document.querySelector('#fees tbody').innerHTML = fees.error
+      ? `<tr><td colspan="4" class="error">Could not load fees (${fees.error.message}).</td></tr>`
+      : fees.data.map(f => `<tr><td>${f.name}</td><td>${period(f.period)}</td>
+          <td class="num">${eur(f.amount_cents)}</td>
+          <td>${f.decided_by_vote_on ?? '—'}</td></tr>`).join('');
+  </script>
+</body>
+</html>

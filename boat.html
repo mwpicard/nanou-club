@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The boat — Nanou Club</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⛵</text></svg>">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <header class="site">
+    <a class="brand" href="index.html">NANOU CLUB</a>
+    <nav>
+      <a href="index.html">The story</a>
+      <a href="boat.html" aria-current="page">The boat</a>
+      <a href="costs.html">Costs &amp; fees</a>
+      <a href="join.html">Join the club</a>
+      <a href="https://nanou.org">Adventures so far ↗</a>
+    </nav>
+  </header>
+  <main>
+    <p class="eyebrow">S/V NANOU · Bruce Roberts design · steel</p>
+    <h1>The boat</h1>
+    <p class="lede">Built 1986 in Durban, South Africa. 16.5 m, 35 tons of marine-grade
+    steel, cutter rigged, flying the Australian flag. Range: 1,800 nautical
+    miles between fuel stops — and she has crossed every ocean she's met.</p>
+
+    <h2>Accommodation</h2>
+    <div class="card">
+      <ul class="specs">
+        <li><strong>Master cabin</strong> with ensuite — 1 double berth</li>
+        <li><strong>Guest cabin</strong> — 1 double berth</li>
+        <li><strong>4 single berths</strong> and a <strong>couch berth</strong> in the saloon</li>
+        <li><strong>Forward crew cabin</strong> with second head — reserved for the paid crew</li>
+      </ul>
+      <p><span class="chip">Hot bunking is a Nanou tradition</span> — on passage,
+      more souls than berths is normal. Berth counts on the chart are guidance,
+      not walls.</p>
+    </div>
+
+    <h2>Specifications</h2>
+    <div class="grid2">
+      <div class="card">
+        <h3>Sailing</h3>
+        <ul class="specs">
+          <li>Cutter rig, 22 m mast</li>
+          <li>Two head sails, storm staysail, mainsail</li>
+          <li>Twin genoas with double whisker poles</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Machinery</h3>
+        <ul class="specs">
+          <li>Perkins M130 diesel, 135 HP (1997)</li>
+          <li>600 W solar, wind generator, 6 kVA silent diesel</li>
+          <li>Electric windlass, 150 m of heavy chain</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Water &amp; comfort</h3>
+        <ul class="specs">
+          <li>4,800 L drinking water + 100 L/h watermaker</li>
+          <li>Washer/dryer, fridge and separate freezer</li>
+          <li>Boarding platform, 3.5 m tender with 10 HP outboard</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Adventure</h3>
+        <ul class="specs">
+          <li>Poseidon dive compressor, equipment for 4 divers</li>
+          <li>10-person liferaft with watermaker and EPIRB</li>
+          <li>VHF, HF radio, satellite email</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Recommissioning</h2>
+    <p>She needs several weeks of yard work, a new mainsail and some electrics;
+    a bow thruster is under study to make her friendlier in tight harbours.
+    Progress updates will be posted here by the crew as the work happens.</p>
+    <div id="updates"></div>
+  </main>
+  <footer class="site">NANOU · Port de Masnou · <a href="https://nanou.org">the adventures so far</a></footer>
+  <script type="module">
+    import { supabase } from './js/supabase-client.js';
+    const box = document.getElementById('updates');
+    const { data, error } = await supabase.from('boat_updates')
+      .select('title, body, published_at').order('published_at', { ascending: false }).limit(10);
+    if (!error && data?.length) {
+      box.innerHTML = data.map(u => `<div class="card"><h3>${u.title}</h3>
+        <p class="eyebrow">${new Date(u.published_at).toLocaleDateString('en-GB')}</p>
+        <p>${u.body ?? ''}</p></div>`).join('');
+    }
+  </script>
+</body>
+</html>
