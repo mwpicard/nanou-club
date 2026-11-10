@@ -26,8 +26,11 @@ clicking the route line or harbours on an interactive chart.
 
 ## Git Workflow
 
-**NEVER push without asking first.** Committing locally is fine. Pushes to
-`main` deploy via GitHub Pages.
+**Test exhaustively, then push automatically** (Martin, 2026-11-10; replaces "never push without asking"). Pushes to `main` go live straight away. So test thoroughly first, preferably live in the browser with real clicks. Then push, watch the deploy, check the live site, and report what went live. Work in small, verified slices.
+
+**Coordinate with the other Claude sessions** sharing this tree. Message them before committing or pushing. Commit only your own hunks. Run `git fetch && git log origin/main..main` before a push. Agree on one pusher per batch, and push in sequence.
+
+**Always ask before deleting code or data**, such as files, functions, features or UI, or DB rows, tables or storage. Say exactly what would go and why, then wait for a yes.
 
 ## Feature Protection
 
